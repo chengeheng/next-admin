@@ -3,6 +3,8 @@ import express from "express";
 import bodyParser from "body-parser";
 import cookieParser from "cookie-parser";
 
+import loginRouter from "./routers/login";
+
 const dev = process.env.NODE_ENV !== "production";
 const app = next({ dev });
 // without getRequestHandler() it will throw error
@@ -20,9 +22,12 @@ app
     router.use(bodyParser.urlencoded({ extended: false }));
     router.use(bodyParser.json());
 
-    router.get("/", (req, res) => {
-      res.send("hello world");
-    });
+    return server;
+  })
+  .then((server) => {
+    // login router
+    server.use("/api", loginRouter);
+
     return server;
   })
   .then((server) => {
