@@ -1,7 +1,6 @@
 import { Request, Response } from "express";
 import jwt from "jsonwebtoken";
-
-const key = "node-admin-jwt";
+import { JWT_KEY } from "../config";
 
 // const sign = (load) => {
 //   const payload = { data: load };
@@ -25,7 +24,7 @@ const authMiddleware = async (req: Request, res: Response, next) => {
   if (!token) {
     return res.status(401).json({ error: "用户未登录" });
   }
-  const verified = await jwt.verify(token, key);
+  const verified = await jwt.verify(token, JWT_KEY);
   if (verified) {
     next();
   } else {
