@@ -2,13 +2,28 @@ import next from "next";
 import express from "express";
 import bodyParser from "body-parser";
 import cookieParser from "cookie-parser";
+import mongoose from "mongoose";
 
 import loginRouter from "./routers/login";
+import * as config from "./config/index";
 
 const dev = process.env.NODE_ENV !== "production";
 const app = next({ dev });
 // without getRequestHandler() it will throw error
 const handle = app.getRequestHandler();
+
+const { databaseConfig } = config;
+const mongoHost = `mongodb://${databaseConfig.username}:${databaseConfig.password}@${databaseConfig.host}:${databaseConfig.port}/${databaseConfig.database}`;
+mongoose
+  .connect(mongoHost, {
+    authSource: "admin",
+  })
+  .then(() => {
+    console.log("connect established: ", mongoHost);
+  })
+  .catch((err) => {
+    console.log("connect error: ", err);
+  });
 
 app
   .prepare()
@@ -18,9 +33,9 @@ app
     server.use(router);
 
     // express config
-    router.use(cookieParser());
     router.use(bodyParser.urlencoded({ extended: false }));
     router.use(bodyParser.json());
+    router.use(cookieParser());
 
     return server;
   })
