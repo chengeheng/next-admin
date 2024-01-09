@@ -3,9 +3,12 @@ import express from "express";
 import bodyParser from "body-parser";
 import cookieParser from "cookie-parser";
 import mongoose from "mongoose";
+import passport from "passport";
+import session from "express-session";
 
 import loginRouter from "./routers/login";
 import * as config from "./config/index";
+import passportLocal from "./common/passport-local";
 
 const dev = process.env.NODE_ENV !== "production";
 const app = next({ dev });
@@ -36,6 +39,23 @@ app
     router.use(bodyParser.urlencoded({ extended: false }));
     router.use(bodyParser.json());
     router.use(cookieParser());
+
+    router.use(
+      session({
+        secret: config.JWT_KEY,
+        resave: false,
+        saveUninitialized: true,
+      })
+    );
+    router.use(passport.initialize());
+    router.use(passport.session());
+
+    passportLocal(passport);
+
+    router.use((req, res, next) => {
+      req.passport = passport;
+      next();
+    });
 
     return server;
   })

@@ -15,18 +15,21 @@ const sign = (load) => {
   return jwt.sign(payload, config.JWT_KEY, expiresIn);
 };
 
-router.post("/login", (req: Request, res: Response) => {
+router.post("/login", async (req: Request, res: Response) => {
   const { username, password } = req.body;
+  console.log(username, password);
   if (
     Users.some((i) => {
       return i.username === username && i.password === password;
     })
   ) {
     const token = sign({ username, password });
-    res.cookie("authorization", token, {
+    await res.cookie("authorization", token, {
       expires: new Date(Date.now() + config.JWT_EXPIRY),
     });
     res.status(200).send({ success: true });
+  } else {
+    res.status(401).send({ success: true });
   }
 });
 
