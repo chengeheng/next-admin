@@ -31,17 +31,20 @@ const authMiddleware = async (req: Request, res: Response, next) => {
   // }
   req.passport &&
     req.passport.authenticate("jwt", { session: false }, (err, user, info) => {
+      console.log("-----------------------------------------------");
+      console.log(err, user, info);
       if (err) {
         return next(err);
       }
+
       if (!user)
         return res.send({ success: true, code: 0, message: "权限禁止" });
 
-      console.log(user);
+      console.log("user:", user);
 
       req.userInfo = user;
       next();
-    });
+    })(req, res, next);
 };
 
 export default authMiddleware;

@@ -32,31 +32,29 @@ app
   .prepare()
   .then(() => {
     const server = express();
-    const router = express.Router();
-    server.use(router);
 
     // express config
-    router.use(bodyParser.urlencoded({ extended: false }));
-    router.use(bodyParser.json());
-    router.use(cookieParser());
+    server.use(bodyParser.urlencoded({ extended: false }));
+    server.use(bodyParser.json());
+    server.use(cookieParser());
 
-    router.use(
+    server.use(
       session({
         secret: config.JWT_KEY,
         resave: false,
         saveUninitialized: true,
       })
     );
-    router.use(passport.initialize());
-    router.use(passport.session());
+    // passport
+    server.use(passport.initialize());
+    // server.use(passport.session());
 
-    passportLocal(passport);
-
-    router.use((req, res, next) => {
+    server.use((req, res, next) => {
       req.passport = passport;
       next();
     });
 
+    passportLocal(passport);
     return server;
   })
   .then((server) => {
