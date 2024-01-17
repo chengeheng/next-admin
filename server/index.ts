@@ -6,7 +6,7 @@ import mongoose from "mongoose";
 import passport from "passport";
 import session from "express-session";
 
-import loginRouter from "./routers/login";
+import authRouter from "./routers/auth";
 import * as config from "./config/index";
 import passportLocal from "./common/passport-local";
 
@@ -59,7 +59,7 @@ app
   })
   .then((server) => {
     // login router
-    server.use("/api", loginRouter);
+    server.use("/api", authRouter);
 
     return server;
   })

@@ -1,21 +1,4 @@
 import { Request, Response } from "express";
-// import jwt from "jsonwebtoken";
-// import { JWT_KEY } from "../config";
-
-// const sign = (load) => {
-//   const payload = { data: load };
-//   const expiresIn = { expiresIn: 86400 };
-//   return jwt.sign(payload, key, expiresIn);
-// };
-
-// const verify = (token) => {
-//   try {
-//     jwt.verify(token, key);
-//     return true;
-//   } catch (error) {
-//     return false;
-//   }
-// };
 
 const authMiddleware = async (req: Request, res: Response, next) => {
   // const tokenHeaderKey = "Authorization";
@@ -31,16 +14,10 @@ const authMiddleware = async (req: Request, res: Response, next) => {
   // }
   req.passport &&
     req.passport.authenticate("jwt", { session: false }, (err, user, info) => {
-      console.log("-----------------------------------------------");
-      console.log(err, user, info);
-      if (err) {
-        return next(err);
-      }
+      if (err) return next(err);
 
       if (!user)
         return res.send({ success: true, code: 0, message: "权限禁止" });
-
-      console.log("user:", user);
 
       req.userInfo = user;
       next();

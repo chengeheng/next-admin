@@ -27,12 +27,10 @@ export default (passport) => {
   passport.use(
     new JwtStrategy(opts, async function (req, jwt_payload, done) {
       try {
-        console.log("**********:", jwt_payload);
         const userInfo = await User.findOne({
           user_uuid: jwt_payload.user_uuid,
         });
-        console.log(userInfo);
-        if (userInfo && userInfo.user_role > 0) {
+        if (userInfo && userInfo.role > 0) {
           done(null, userInfo);
         } else {
           done(null, false);
