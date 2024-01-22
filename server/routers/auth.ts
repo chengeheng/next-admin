@@ -14,7 +14,7 @@ const router = express.Router();
  */
 router.post("/login", authController.login);
 router.post("/logout", authMiddleware, authController.logout);
-router.post("/token/refresh", authMiddleware, authController.refreshToken);
+router.get("/token/refresh", authMiddleware, authController.refreshToken);
 router.put("/user", authMiddleware, authController.updateUserInfo);
 router.post("/user", authMiddleware, authController.register);
 router.delete("/user", authMiddleware, authController.deleteUser);

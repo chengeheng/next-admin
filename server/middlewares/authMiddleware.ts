@@ -17,7 +17,9 @@ const authMiddleware = async (req: Request, res: Response, next) => {
       if (err) return next(err);
 
       if (!user)
-        return res.send({ success: true, code: 0, message: "权限禁止" });
+        return res
+          .status(401)
+          .send({ success: true, code: 0, message: "权限禁止" });
 
       req.userInfo = user;
       next();
