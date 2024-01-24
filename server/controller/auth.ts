@@ -24,7 +24,7 @@ const GenerateToken = (user) => {
   );
 };
 
-const login = async (req, res) => {
+const login = async (req: Request, res: Response) => {
   try {
     const { username, password } = req.body;
 

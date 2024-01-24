@@ -1,4 +1,5 @@
 import axios, { AxiosRequestConfig, AxiosResponse } from "axios";
+import { getAccessTokenInCookie } from "./cookieUtils";
 
 // let makeRequest =<P>:P
 const makeRequest = <P, R>(
@@ -6,9 +7,13 @@ const makeRequest = <P, R>(
 ): Promise<AxiosResponse<R, P>> => {
   const service = axios.create(options);
   service.interceptors.request.use((config) => {
-    console.log("request:", config);
+    const headers = Object.assign({}, config.headers);
+    const access_token = getAccessTokenInCookie();
+    if (access_token) {
+      headers.Authorization = headers.Authorization || `Bearer ${access_token}`;
+    }
     // request middleware
-    return config;
+    return { ...config, headers };
   });
   service.interceptors.response.use((config) => {
     // response middleware

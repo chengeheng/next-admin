@@ -3,23 +3,28 @@ import { Form, Input, Button } from "antd";
 import { UserOutlined, LockOutlined } from "@ant-design/icons";
 
 import styles from "./page.module.css";
-import axios, { AxiosRequestConfig, AxiosResponse } from "axios";
+import { AxiosResponse } from "axios";
 import useSWRMutation, { MutationFetcher } from "swr/mutation";
 
-import request from "@/client/request";
+import request from "@/client/utils/request";
 import useSWR, { Fetcher } from "swr";
+import { useRouter } from "next/navigation";
+import { useCallback, useEffect } from "react";
 
 interface loginProps {
   username: string;
   password: string;
 }
 const url = "/api/login";
-const refreshUrl = "/api/token/refresh";
+const refreshUrl = "/api/user/list";
 // const fetcher: MutationFetcher<AxiosResponse<loginProps>> = async (params) =>
 //   await axios.post<loginProps, any>(url, params);
 const fetcher: MutationFetcher<AxiosResponse<any>, string, loginProps> = (
+  path,
   params
-) => request<loginProps, any>({ url, params });
+) => {
+  return request<loginProps, any>({ method: "post", url, data: params.arg });
+};
 
 // TODO need to understand how pattern works （by delete {name: number} in AxiosResponse）
 const refreshFetcher: Fetcher<
@@ -41,6 +46,26 @@ const Login = (props) => {
   );
   console.log(data);
   console.log("testData:", testData);
+  const router = useRouter();
+
+  const handleSubmit = useCallback(
+    () =>
+      form.validateFields().then((values: loginProps) => {
+        trigger({
+          username: values.username,
+          password: values.password,
+        }).then(() => {
+          router.push("/dashboard");
+        });
+      }),
+    [router]
+  );
+
+  useEffect(() => {
+    document.addEventListener("keypress", (e) => {
+      console.log(e);
+    });
+  }, [handleSubmit]);
 
   return (
     <div className={styles.main}>
@@ -60,15 +85,7 @@ const Login = (props) => {
               <Button
                 style={{ width: "100%" }}
                 type="primary"
-                onClick={() => {
-                  console.log("click");
-                  form.validateFields().then((values: loginProps) => {
-                    trigger({
-                      username: values.username,
-                      password: values.password,
-                    });
-                  });
-                }}
+                onClick={handleSubmit}
               >
                 立即登录
               </Button>

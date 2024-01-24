@@ -60,7 +60,12 @@ app
   .then((server) => {
     // login router
     server.use("/api", authRouter);
-
+    server.use((req, res, next) => {
+      if (req.url === "/" && !req.userInfo) {
+        res.redirect("/login");
+      }
+      next();
+    });
     return server;
   })
   .then((server) => {

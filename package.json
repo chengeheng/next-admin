@@ -12,6 +12,7 @@
   },
   "dependencies": {
     "@ant-design/icons": "^5.2.6",
+    "@ant-design/nextjs-registry": "^1.0.0",
     "antd": "^5.12.7",
     "axios": "^1.6.5",
     "cookie-parser": "^1.4.6",
