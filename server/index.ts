@@ -3,12 +3,11 @@ import express from "express";
 import bodyParser from "body-parser";
 import cookieParser from "cookie-parser";
 import mongoose from "mongoose";
-import passport from "passport";
+import passport from "./common/passport-local";
 import session from "express-session";
 
 import authRouter from "./routers/auth";
 import * as config from "./config/index";
-import passportLocal from "./common/passport-local";
 
 const dev = process.env.NODE_ENV !== "production";
 const app = next({ dev });
@@ -17,16 +16,18 @@ const handle = app.getRequestHandler();
 
 const { databaseConfig } = config;
 const mongoHost = `mongodb://${databaseConfig.username}:${databaseConfig.password}@${databaseConfig.host}:${databaseConfig.port}/${databaseConfig.database}`;
-mongoose
-  .connect(mongoHost, {
-    authSource: "admin",
-  })
-  .then(() => {
-    console.log("connect established: ", mongoHost);
-  })
-  .catch((err) => {
-    console.log("connect error: ", err);
-  });
+if (dev) {
+  mongoose
+    .connect(mongoHost, {
+      authSource: "admin",
+    })
+    .then(() => {
+      console.log("connect established: ", mongoHost);
+    })
+    .catch((err) => {
+      console.log("connect error: ", err);
+    });
+}
 
 app
   .prepare()
@@ -54,7 +55,6 @@ app
       next();
     });
 
-    passportLocal(passport);
     return server;
   })
   .then((server) => {

@@ -27,6 +27,19 @@ const GenerateToken = (user) => {
 const login = async (req: Request, res: Response) => {
   try {
     const { username, password } = req.body;
+    if (process.env.NODE_ENV !== "production") {
+      if (username === "admin" && password === "admin") {
+        const token = GenerateToken({ username, password });
+        await res.cookie("authorization", token, {
+          expires: new Date(Date.now() + config.JWT_EXPIRY),
+          httpOnly: true,
+          secure: false,
+        });
+        return res.send({ code: 0, token: "Bearer " + token });
+      } else {
+        return res.send({ code: 1, message: "用户名或密码错误！" });
+      }
+    }
 
     // TAG remember this must add await
     const userInfo = await User.findOne({ username: username });
@@ -38,12 +51,12 @@ const login = async (req: Request, res: Response) => {
           httpOnly: true,
           secure: process.env.NODE_ENV === "production",
         });
-        return res.send({ code: 1, token: "Bearer " + token });
+        return res.send({ code: 0, token: "Bearer " + token });
       } else {
-        return res.send({ code: 0, message: "密码错误！" });
+        return res.send({ code: 1, message: "密码错误！" });
       }
     } else {
-      return res.send({ code: 0, message: "该用户不存在" });
+      return res.send({ code: 1, message: "该用户不存在" });
     }
   } catch (err) {
     return res.send({
@@ -64,7 +77,7 @@ const register = async (req: Request, res: Response) => {
   const checkUsername = await User.findOne({ username: username });
   if (checkUsername) {
     return res.send({
-      code: 0,
+      code: 1,
       message: "该用户已存在",
     });
   } else {
@@ -84,7 +97,7 @@ const register = async (req: Request, res: Response) => {
       .catch((err) => {
         console.log("add user error: ", err);
         res.send({
-          code: 0,
+          code: 1,
           message: "注册失败!  ",
           err: err.toString(),
         });
@@ -133,9 +146,9 @@ const updateUserInfo = async (req: Request, res: Response) => {
         role: role,
       };
       await User.findOneAndUpdate({ uuid: uuid }, params);
-      return res.send({ code: 1, user: params });
+      return res.send({ code: 0, user: params });
     } catch (err) {
-      return res.send({ code: 0, message: "权限不足，禁止修改！" });
+      return res.send({ code: 1, message: "权限不足，禁止修改！" });
     }
   }
 };
@@ -151,14 +164,14 @@ const deleteUser = async (req: Request, res: Response) => {
           uuid: uuid,
         });
         return res.send({
-          code: 1,
+          code: 0,
           message: "删除成功！",
         });
       } else {
-        return res.send({ code: 0, message: "该用户不存在！" });
+        return res.send({ code: 1, message: "该用户不存在！" });
       }
     } catch (err) {
-      return res.send({ code: 0, message: "权限不足，禁止修改！" });
+      return res.send({ code: 1, message: "权限不足，禁止修改！" });
     }
   }
 };

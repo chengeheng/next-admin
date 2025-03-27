@@ -7,7 +7,6 @@ import { AxiosResponse } from "axios";
 import useSWRMutation, { MutationFetcher } from "swr/mutation";
 
 import request from "@/client/utils/request";
-import useSWR, { Fetcher } from "swr";
 import { useRouter } from "next/navigation";
 import { useCallback, useEffect } from "react";
 
@@ -16,7 +15,6 @@ interface loginProps {
   password: string;
 }
 const url = "/api/login";
-const refreshUrl = "/api/user/list";
 // const fetcher: MutationFetcher<AxiosResponse<loginProps>> = async (params) =>
 //   await axios.post<loginProps, any>(url, params);
 const fetcher: MutationFetcher<AxiosResponse<any>, string, loginProps> = (
@@ -26,26 +24,10 @@ const fetcher: MutationFetcher<AxiosResponse<any>, string, loginProps> = (
   return request<loginProps, any>({ method: "post", url, data: params.arg });
 };
 
-// TODO need to understand how pattern works （by delete {name: number} in AxiosResponse）
-const refreshFetcher: Fetcher<
-  AxiosResponse<{ user: string }, { name: number }>,
-  { name: number }
-> = (params) =>
-  request({
-    url: refreshUrl,
-    method: "get",
-    params,
-  });
-
 const Login = (props) => {
   const [form] = Form.useForm();
 
   const { data, trigger } = useSWRMutation(url, fetcher);
-  const { data: testData } = useSWR([refreshUrl, 123], ([key, name]) =>
-    refreshFetcher({ name })
-  );
-  console.log(data);
-  console.log("testData:", testData);
   const router = useRouter();
 
   const handleSubmit = useCallback(
@@ -54,7 +36,7 @@ const Login = (props) => {
         trigger({
           username: values.username,
           password: values.password,
-        }).then(() => {
+        }).then((res) => {
           router.push("/dashboard");
         });
       }),
@@ -62,9 +44,9 @@ const Login = (props) => {
   );
 
   useEffect(() => {
-    document.addEventListener("keypress", (e) => {
-      console.log(e);
-    });
+    // document.addEventListener("keypress", (e) => {
+    //   console.log(e);
+    // });
   }, [handleSubmit]);
 
   return (
