@@ -15,7 +15,6 @@ const authMiddleware = async (req: Request, res: Response, next) => {
   req.passport &&
     req.passport.authenticate("jwt", { session: false }, (err, user, info) => {
       if (err) return next(err);
-
       if (!user)
         return res
           .status(401)

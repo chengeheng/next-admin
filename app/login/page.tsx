@@ -3,31 +3,21 @@ import { Form, Input, Button } from "antd";
 import { UserOutlined, LockOutlined } from "@ant-design/icons";
 
 import styles from "./page.module.css";
-import { AxiosResponse } from "axios";
-import useSWRMutation, { MutationFetcher } from "swr/mutation";
+import useSWRMutation from "swr/mutation";
 
-import request from "@/client/utils/request";
 import { useRouter } from "next/navigation";
 import { useCallback, useEffect } from "react";
+import { loginFetcher } from "@/client/api/login";
 
 interface loginProps {
   username: string;
   password: string;
 }
-const url = "/api/login";
-// const fetcher: MutationFetcher<AxiosResponse<loginProps>> = async (params) =>
-//   await axios.post<loginProps, any>(url, params);
-const fetcher: MutationFetcher<AxiosResponse<any>, string, loginProps> = (
-  path,
-  params
-) => {
-  return request<loginProps, any>({ method: "post", url, data: params.arg });
-};
 
 const Login = (props) => {
   const [form] = Form.useForm();
 
-  const { data, trigger } = useSWRMutation(url, fetcher);
+  const { data, trigger } = useSWRMutation("/api/login", loginFetcher);
   const router = useRouter();
 
   const handleSubmit = useCallback(
@@ -45,7 +35,9 @@ const Login = (props) => {
 
   useEffect(() => {
     // document.addEventListener("keypress", (e) => {
-    //   console.log(e);
+    //   if (e.key === "Enter") {
+    //     handleSubmit();
+    //   }
     // });
   }, [handleSubmit]);
 
@@ -56,7 +48,7 @@ const Login = (props) => {
           <h2>Next Admin</h2>
         </div>
         <div className={styles.bottom}>
-          <Form form={form}>
+          <Form form={form} onSubmitCapture={handleSubmit}>
             <Form.Item name="username">
               <Input prefix={<UserOutlined color="#1677ff" />}></Input>
             </Form.Item>

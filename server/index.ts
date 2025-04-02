@@ -16,18 +16,16 @@ const handle = app.getRequestHandler();
 
 const { databaseConfig } = config;
 const mongoHost = `mongodb://${databaseConfig.username}:${databaseConfig.password}@${databaseConfig.host}:${databaseConfig.port}/${databaseConfig.database}`;
-if (dev) {
-  mongoose
-    .connect(mongoHost, {
-      authSource: "admin",
-    })
-    .then(() => {
-      console.log("connect established: ", mongoHost);
-    })
-    .catch((err) => {
-      console.log("connect error: ", err);
-    });
-}
+mongoose
+  .connect(mongoHost, {
+    authSource: "admin",
+  })
+  .then(() => {
+    console.log("connect established: ", mongoHost);
+  })
+  .catch((err) => {
+    console.log("connect error: ", err);
+  });
 
 app
   .prepare()
@@ -35,7 +33,7 @@ app
     const server = express();
 
     // express config
-    server.use(bodyParser.urlencoded({ extended: false }));
+    server.use(bodyParser.urlencoded({ extended: true }));
     server.use(bodyParser.json());
     server.use(cookieParser());
 
@@ -60,12 +58,6 @@ app
   .then((server) => {
     // login router
     server.use("/api", authRouter);
-    server.use((req, res, next) => {
-      if (req.url === "/" && !req.userInfo) {
-        res.redirect("/login");
-      }
-      next();
-    });
     return server;
   })
   .then((server) => {

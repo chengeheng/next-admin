@@ -1,6 +1,5 @@
 import axios, { AxiosRequestConfig, AxiosResponse } from "axios";
 import { getAccessTokenInCookie } from "./cookieUtils";
-import Router from "next/router"; // 用于重定向
 
 // let makeRequest =<P>:P
 const makeRequest = <P, R>(
@@ -31,7 +30,8 @@ const makeRequest = <P, R>(
         const { status } = error.response;
         if (status === 401) {
           // 401 未授权，重定向到登录页
-          Router.replace("/login");
+          window.localStorage.removeItem("access_token");
+          window.location.href = "/login";
         }
         return Promise.reject(error.response);
       }
