@@ -3,12 +3,11 @@ import express from "express";
 import bodyParser from "body-parser";
 import cookieParser from "cookie-parser";
 import mongoose from "mongoose";
-import passport from "passport";
+import passport from "./common/passport-local";
 import session from "express-session";
 
 import authRouter from "./routers/auth";
 import * as config from "./config/index";
-import passportLocal from "./common/passport-local";
 
 const dev = process.env.NODE_ENV !== "production";
 const app = next({ dev });
@@ -34,7 +33,7 @@ app
     const server = express();
 
     // express config
-    server.use(bodyParser.urlencoded({ extended: false }));
+    server.use(bodyParser.urlencoded({ extended: true }));
     server.use(bodyParser.json());
     server.use(cookieParser());
 
@@ -54,13 +53,11 @@ app
       next();
     });
 
-    passportLocal(passport);
     return server;
   })
   .then((server) => {
     // login router
     server.use("/api", authRouter);
-
     return server;
   })
   .then((server) => {

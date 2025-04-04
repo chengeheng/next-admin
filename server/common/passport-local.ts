@@ -1,6 +1,7 @@
 import * as config from "../config";
 import User from "../models/user";
 import { Strategy as JwtStrategy, ExtractJwt } from "passport-jwt";
+import passport from "passport";
 
 const opts = {
   // Prepare the extractor from the header.
@@ -23,21 +24,21 @@ const opts = {
   passReqToCallback: true,
 };
 
-export default (passport) => {
-  passport.use(
-    new JwtStrategy(opts, async function (req, jwt_payload, done) {
-      try {
-        const userInfo = await User.findOne({
-          user_uuid: jwt_payload.user_uuid,
-        });
-        if (userInfo && userInfo.role > 0) {
-          done(null, userInfo);
-        } else {
-          done(null, false);
-        }
-      } catch (e) {
-        return done(e);
+passport.use(
+  new JwtStrategy(opts, async function (req, jwt_payload, done) {
+    try {
+      const userInfo = await User.findOne({
+        user_uuid: jwt_payload.user_uuid,
+      });
+      if (userInfo && userInfo.role > 0) {
+        done(null, userInfo);
+      } else {
+        done(null, false);
       }
-    })
-  );
-};
+    } catch (e) {
+      return done(e);
+    }
+  })
+);
+
+export default passport;
